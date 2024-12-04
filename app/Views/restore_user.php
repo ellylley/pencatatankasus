@@ -58,7 +58,7 @@
                                             }
                                         ?></td>
                                         <td>
-                                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#userDetailModal" onclick="showUserDetail('<?= $gou->nama_user ?>', '<?= $gou->email ?>', '<?= $gou->nohp ?>','<?= $gou->jk ?>','<?= $gou->tgl_lhr ?>', '<?= $gou->level ?>', '<?= $gou->jurusan . " " . $gou->nama_kelas ?>', '<?= $gou->nis ?>', '<?= $gou->nisn ?>', '<?= $gou->nik ?>', '<?= $gou->nuptk ?>')">Detail</button>
+                                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#userDetailModal" onclick="showUserDetail('<?= $gou->nama_user ?>', '<?= $gou->email ?>', '<?= $gou->nohp ?>','<?= $gou->jk ?>','<?= $gou->tgl_lhr ?>', '<?= $gou->level ?>', '<?= $gou->jurusan . " " . $gou->nama_kelas ?>', '<?= $gou->nis ?>', '<?= $gou->nisn ?>', '<?= $gou->nik ?>', '<?= $gou->nuptk ?>', '<?= $gou->nohp_wali ?>', '<?= $gou->nama_wali ?>')">Detail</button>
                                         <a href="<?= base_url('home/aksi_restore_user/'.$gou->id_user)?>">
     <button class="btn btn-danger btn-sm ">Restore</button>
     </a>
@@ -97,6 +97,8 @@
         <p><strong>NISN:</strong> <span id="modalUserNISN"></span></p>
         <p><strong>NIK:</strong> <span id="modalUserNIK"></span></p>
         <p><strong>NUPTK:</strong> <span id="modalUserNUPTK"></span></p>
+        <p><strong>Nomor Telepon Wali:</strong> <span id="modalUsernowali"></span></p>
+        <p><strong>Nama Wali:</strong> <span id="modalUsernamawali"></span></p>
         
         <!-- Kamu bisa menambahkan informasi lain di sini -->
       </div>
@@ -106,7 +108,7 @@
 </div>
 
 <script>
-function showUserDetail(name, email, nohp, jk,lahir, role, id_kelas, nis, nisn, nik, nuptk) {
+function showUserDetail(name, email, nohp, jk,lahir, role, id_kelas, nis, nisn, nik, nuptk, nowali, namawali) {
     document.getElementById('modalUserName').textContent = name;
     document.getElementById('modalUseremail').textContent = email;
     document.getElementById('modalUsernohp').textContent = nohp;
@@ -146,6 +148,8 @@ function showUserDetail(name, email, nohp, jk,lahir, role, id_kelas, nis, nisn, 
     document.getElementById('modalUserNISN').textContent = nisn;
     document.getElementById('modalUserNIK').textContent = nik;
     document.getElementById('modalUserNUPTK').textContent = nuptk;
+    document.getElementById('modalUsernowali').textContent = nowali;
+    document.getElementById('modalUsernamawali').textContent = namawali;
     
 }
 </script>

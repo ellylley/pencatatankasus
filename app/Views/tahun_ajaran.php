@@ -56,7 +56,7 @@
                                     <tr>
                                         <th>No</th>
                                         <th>Tahun Ajaran</th>
-                                        
+                                        <th>Status</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
@@ -69,7 +69,15 @@
                                     <tr>
                                         <td><?= $no++ ?></td>
                                         <td><?= $gou->tahun ?></td>
-                                       
+                                        <td>
+            <button class="btn <?= $gou->status == 1 ? 'btn-success' : 'btn-danger' ?>" 
+                data-bs-toggle="modal" 
+                data-bs-target="#updateStatusModal"
+                data-id="<?= $gou->id_tahun ?>" 
+                data-status="<?= $gou->status ?>">
+                <?= $gou->status == 1 ? 'AKTIF' : 'TIDAK AKTIF' ?>
+            </button>
+        </td>
                                         <td>
     <div class="dropdown">
         <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="actionMenu" data-bs-toggle="dropdown" aria-expanded="false">
@@ -227,7 +235,30 @@
 
 
 
+<div class="modal fade" id="updateStatusModal" tabindex="-1" aria-labelledby="updateStatusModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateStatusModalLabel">Update Status</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="updateStatusForm" action="<?= base_url('home/aksi_update_status') ?>" method="POST">
+                    <input type="hidden" id="statusId" name="id">
+                    <div class="mb-3">
+                        <label for="statusSelect" class="form-label">Status</label>
+                        <select class="form-select" id="statusSelect" name="status">
+                            <option value="1">AKTIF</option>
+                            <option value="2">TIDAK AKTIF</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
+
 
 <!-- Script to populate edit modal with existing data -->
 <script>
@@ -251,6 +282,15 @@
 
     
     });
+    document.addEventListener('show.bs.modal', function (event) {
+    var button = event.relatedTarget;
+    var id = button.getAttribute('data-id');
+    var status = button.getAttribute('data-status');
+
+    var modal = document.getElementById('updateStatusModal');
+    modal.querySelector('#statusId').value = id;
+    modal.querySelector('#statusSelect').value = status;
+});
 
     
 

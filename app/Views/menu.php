@@ -152,7 +152,7 @@ if(session()->get('level') == 1)
     </li>
 
     <li>
-        <a href="<?= base_url("home/restore_kasus")?>">RESTORE KASUS</a>
+        <a href="<?= base_url("home/restore_kasus")?>">RESTORE CATATAN KASUS</a>
     </li>
     
 </ul>

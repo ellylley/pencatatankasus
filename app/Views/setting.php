@@ -62,6 +62,10 @@
             <input name="alamat" type="text" class="form-control" id="alamat" value="<?= $user->alamat?>">
         </div>
         <div class="profile-info">
+            <label for="name">Kota:</label>
+            <input name="kota" type="text" class="form-control" id="kota" value="<?= $user->kota?>">
+        </div>
+        <div class="profile-info">
             <label for="name">Nomor Telepon:</label>
             <input name="nohp" type="text" class="form-control" id="nohp" value="<?= $user->nohp?>">
         </div>

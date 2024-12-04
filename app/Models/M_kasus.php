@@ -5,6 +5,28 @@ use CodeIgniter\Model;
 
 Class M_kasus extends Model
 {
+
+    protected $table = 'kasus_pelanggaran'; // Tabel yang digunakan
+    protected $primaryKey = 'id'; // Primary key tabel
+    protected $allowedFields = [
+        'id_user', 
+        'tgl_kejadian', 
+        'bentuk_pelanggaran', 
+        'tindak_lanjut', 
+        'catatan', 
+        'id_tahun', 
+        'tgl_pertemuan_wali', 
+        'kasus_ke', 
+        'created_at', 
+        'created_by'
+    ];
+
+    public function hitungKasusKe($id_user)
+    {
+        // Pastikan fungsi ini memanggil metode pada tabel yang benar
+        $jumlahKasus = $this->where('id_user', $id_user)->countAllResults();
+        return $jumlahKasus + 1; // Kasus ke berikutnya
+    }
   public function tampil($tabel,$id){
     return $this->db->table($tabel)
                     ->orderby ($id,'desc') 
@@ -253,6 +275,18 @@ public function jointigawherekasus($tabel, $tabel2, $tabel3, $on, $on2, $id, $wh
                     ->getWhere($where)
                     ->getResult();
 }
+
+public function joinempatwherekasus($tabel, $tabel2, $tabel3,$tabel4, $on, $on2,$on3, $id, $where)
+{
+    return $this->db->table($tabel)
+                    ->select("*, $tabel.id_user AS user_id_user, $tabel.id_kasus AS surat_id_kasus")
+                    ->join($tabel2, $on, 'left')
+                    ->join($tabel3, $on2, 'left')
+                    ->join($tabel4, $on3, 'left')
+                    ->orderBy($id, 'desc')
+                    ->getWhere($where)
+                    ->getResult();
+}
 public function joinempatwhere($tabel, $tabel2, $tabel3, $tabel4, $on, $on2, $on3, $id, $where){
   return $this->db->table($tabel)
                  ->join($tabel2, $on,'left')
@@ -265,18 +299,22 @@ public function joinempatwhere($tabel, $tabel2, $tabel3, $tabel4, $on, $on2, $on
 public function getKasusByTahun($id_tahun)
 {
     return $this->db->table('kasus_pelanggaran')
-        ->select('kasus_pelanggaran.*, user.nama_user, user.nis')
+        ->select('kasus_pelanggaran.*, user.nama_user, user.nis, kelas.nama_kelas, kelas.jurusan')
         ->join('user', 'user.id_user = kasus_pelanggaran.id_user')
+        ->join('kelas', 'kelas.id_kelas = user.id_kelas') // join tabel kelas
         ->where('kasus_pelanggaran.id_tahun', $id_tahun)
         ->get()
         ->getResult();
 }
+
+
 
 public function getKasusByTahunAndUser($id_tahun, $id_user)
 {
     // Query untuk mendapatkan kasus berdasarkan tahun ajaran dan id_user
     return $this->db->table('kasus_pelanggaran')
                     ->join('user', 'kasus_pelanggaran.id_user = user.id_user')
+                    ->join('kelas', 'kelas.id_kelas = user.id_kelas') // join tabel kelas
                     ->where('kasus_pelanggaran.isdelete', 0)
                     ->where('kasus_pelanggaran.id_tahun', $id_tahun)
                     ->where('kasus_pelanggaran.id_user', $id_user)
@@ -367,7 +405,7 @@ public function getPassword($userId)
 }
 
 
-public function getAll($table, $conditions = [], $orderBy = null)
+public function getAll($table, $conditions = [], $orderBy = 'created_at DESC')
 {
     $builder = $this->db->table($table);
 
@@ -376,11 +414,12 @@ public function getAll($table, $conditions = [], $orderBy = null)
     }
 
     if (!empty($orderBy)) {
-        $builder->orderBy($orderBy); // Menambahkan pengurutan jika parameter orderBy diberikan
+        $builder->orderBy($orderBy);
     }
 
-    return $builder->get()->getResult();
+    return $builder->get()->getResult(); // Mengembalikan hasil query
 }
+
 
 public function getActivityLogs()
 {

@@ -281,7 +281,9 @@ public function aksisetting()
     $alamat = $this->request->getPost('alamat');
     $nohp = $this->request->getPost('nohp');
     $sekolah = $this->request->getPost('sekolah');
+    $kota = $this->request->getPost('kota');
     $id = $this->request->getPost('id');
+    
     $uploadedFile = $this->request->getFile('foto');
 
     $where = array('id_setting' => $id);
@@ -290,6 +292,7 @@ public function aksisetting()
         'nama_setting' => $nama,
         'alamat' => $alamat,
         'nohp' => $nohp,
+        'kota' => $kota,
         'nama_sekolah'=> $sekolah,
         'updated_at' => date('Y-m-d H:i:s'), // Waktu saat produk dibuat
         'updated_by' => $id_user // ID user yang login
@@ -441,7 +444,10 @@ public function user()
         $activity = 'Mengakses halaman user'; // Deskripsi aktivitas
         $this->addLog($id_user, $activity);
 
-        $data['kelas'] = $model->tampil('kelas', 'id_kelas');
+        // $data['kelas'] = $model->tampil('kelas', 'id_kelas');
+
+        $data['kelas'] = $model->getAll('kelas', ['isdelete' => 0]);
+
         $data['elly'] = $model->tampil('user', 'id_user');
         $data['backup_users'] = []; // Inisialisasi array untuk backup user
 
@@ -487,6 +493,8 @@ public function aksi_tambah_user()
         $j = $this->request->getPost('nohp');
         $k = $this->request->getPost('nik');
         $l = $this->request->getPost('nuptk');
+        $m = $this->request->getPost('namawali');
+        $n = $this->request->getPost('nowali');
         
         // $g = $this->request->getPost('editmodul');
         $uploadedFile = $this->request->getFile('foto');
@@ -515,6 +523,8 @@ public function aksi_tambah_user()
             'nohp' => $j,
             'nik' => $k,
             'nuptk' => $l,
+            'nama_wali' => $m,
+            'nohp_wali' => $n,
             'foto' => $foto,
             'created_at' => date('Y-m-d H:i:s'), // Waktu saat produk dibuat
             'created_by' => $id_user // ID user yang login
@@ -547,6 +557,8 @@ public function aksi_tambah_user()
     $j = $this->request->getPost('nohp');
     $k = $this->request->getPost('nik');
     $l = $this->request->getPost('nuptk');
+    $m = $this->request->getPost('namawali');
+    $n = $this->request->getPost('nowali');
     // $g = $this->request->getPost('editmodul');
     $id = $this->request->getPost('id');
     $fotoName = $this->request->getPost('old_foto'); // Mengambil nama foto lama
@@ -583,11 +595,15 @@ public function aksi_tambah_user()
         $e = null; // NISN
         $f = null; // Kelas
         $l = null;
+        $m = null;
+        $n = null;
        
     } elseif (in_array($b, [2, 3, 4,5,6])) {
         $f = null; // Kelas
         $d = null;
         $e = null;
+        $m = null;
+        $n = null;
     } elseif ($b == 7) {
         $k = null; 
         $l = null;
@@ -608,6 +624,8 @@ public function aksi_tambah_user()
         'nohp' => $j,
         'nik' => $k,
         'nuptk' => $l,
+        'nama_wali' => $m,
+        'nohp_wali' => $n,
         'foto' => $fotoName,
         'updated_at' => date('Y-m-d H:i:s'), // Waktu saat produk dibuat
         'updated_by' => $id_user // ID user yang login
@@ -1030,24 +1048,27 @@ public function restore_kelas()
             'kasus_pelanggaran.isdelete' => 0 // Tambahkan kondisi untuk isdelete=0
             
         );
-        $data['elly'] = $model->jointigawherekasus(
+        $data['elly'] = $model->joinempatwherekasus(
             'kasus_pelanggaran', 
             'user', 
             'kelas', 
+            'surat_peringatan', 
             'kasus_pelanggaran.id_user=user.id_user', 
             'user.id_kelas=kelas.id_kelas', 
+            'surat_peringatan.id_kasus=kasus_pelanggaran.id_kasus', 
             'kasus_pelanggaran.id_kasus',  $where 
             
         );
         // $data['elly'] = $model->joinkondisi('kasus_pelanggaran', 'user', 'kasus_pelanggaran.id_user = user.id_user', 'kasus_pelanggaran.id_kasus', ['kasus_pelanggaran.isdelete' => 0]);
         $data['user'] = $model->getAll('user', ['isdelete' => 0, 'level' => 7], 'nama_user ASC');
 
-        $data['tahun'] = $model->getAll('tahun_ajaran', ['isdelete' => 0]);
+        $data['tahun'] = $model->getAll('tahun_ajaran', ['isdelete' => 0, 'status' => '1']);
+
 
         $data['backup_kasus_pelanggaran'] = []; // Inisialisasi array untuk backup user
 
         foreach ($data['elly'] as $kasus) {
-            $data['backup_kasus_pelanggaran'][$kasus->id_kasus] = $model->getBackupKasus($kasus->id_kasus);
+            $data['backup_kasus_pelanggaran'][$kasus->surat_id_kasus] = $model->getBackupKasus($kasus->surat_id_kasus);
         }
         
         $where = ['id_setting' => 1];
@@ -1063,39 +1084,42 @@ public function restore_kelas()
 }
 
 public function aksi_tambah_kasus()
-    {
-        $model = new M_kasus();
-        $id_user = session()->get('id'); // Ambil ID user dari session
-        $activity = 'Menambah catatan kasus murid'; // Deskripsi aktivitas
-        $this->addLog($id_user, $activity);
-        
-       
-      
-        $a = $this->request->getPost('nama');
-        $b = $this->request->getPost('tgl');
-        $c = $this->request->getPost('pelanggaran');
-        $d = $this->request->getPost('tindak');
-        $e = $this->request->getPost('catatan');
-        $f = $this->request->getPost('tahun');
-      
-    
-        
-        $isi = array(
-            'id_user' => $a,
-            'tgl_kejadian' => $b,
-            'bentuk_pelanggaran' => $c,
-           'tindak_lanjut' => $d,
-            'catatan' => $e,
-            'id_tahun' => $f,
-            'created_at' => date('Y-m-d H:i:s'), // Waktu saat produk dibuat
-            'created_by' => $id_user // ID user yang login
-            
+{
+    $model = new M_kasus();
+    $id_user = session()->get('id'); // Ambil ID user dari session
+    $activity = 'Menambah catatan kasus murid'; // Deskripsi aktivitas
+    $this->addLog($id_user, $activity);
 
-        );
-        $model ->tambah('kasus_pelanggaran', $isi);
-        
-        return redirect()->to('home/catatan_kasus');
-    }
+    // Ambil data dari form
+    $a = $this->request->getPost('nama');
+    $b = $this->request->getPost('tgl');
+    $c = $this->request->getPost('pelanggaran');
+    $d = $this->request->getPost('tindak');
+    $e = $this->request->getPost('catatan');
+    $f = $this->request->getPost('tahun');
+    $g = $this->request->getPost('tglpertemuan');
+
+    // Panggil fungsi dari model untuk mendapatkan kasus_ke
+    $kasusKe = $model->hitungKasusKe($a);
+
+    $isi = array(
+        'id_user' => $a,
+        'tgl_kejadian' => $b,
+        'bentuk_pelanggaran' => $c,
+        'tindak_lanjut' => $d,
+        'catatan' => $e,
+        'id_tahun' => $f,
+        'tgl_pertemuan_wali' => $g,
+        'kasus_ke' => $kasusKe, // Tambahkan kolom kasus_ke
+        'created_at' => date('Y-m-d H:i:s'), // Waktu saat produk dibuat
+        'created_by' => $id_user // ID user yang login
+    );
+
+    $model->tambah('kasus_pelanggaran', $isi);
+
+    return redirect()->to('home/catatan_kasus');
+}
+
 
     public function aksi_edit_kasus()
 {
@@ -1112,6 +1136,7 @@ public function aksi_tambah_kasus()
         $d = $this->request->getPost('tindak');
         $e = $this->request->getPost('catatan');
         $f = $this->request->getPost('tahun');
+        $g = $this->request->getPost('tglpertemuan');
     $id = $this->request->getPost('id');
    
 
@@ -1140,6 +1165,7 @@ public function aksi_tambah_kasus()
        'tindak_lanjut' => $d,
         'catatan' => $e,
         'id_tahun' => $f,
+        'tgl_pertemuan_wali' => $g,
         'updated_at' => date('Y-m-d H:i:s'), // Waktu saat produk dibuat
         'updated_by' => $id_user // ID user yang login
     );
@@ -1186,7 +1212,7 @@ public function aksi_unedit_kasus()
 public function hapuskasus($id){
     $model = new M_kasus();
     $id_user = session()->get('id'); // Ambil ID user dari session
-    $activity = 'Menghapus data catatan kasus'; // Deskripsi aktivitas
+    $activity = 'Menghapus data kasus catatan'; // Deskripsi aktivitas
     $this->addLog($id_user, $activity);
     $data = [
         'isdelete' => 1,
@@ -1297,7 +1323,7 @@ public function aksi_tambah_tahun()
         $isi = array(
           
             'tahun' => $b,
-          
+            'status' => 1,
             'created_at' => date('Y-m-d H:i:s'), // Waktu saat produk dibuat
             'created_by' => $id_user // ID user yang login
 
@@ -1385,6 +1411,29 @@ public function aksi_unedit_tahun()
     return redirect()->to('home/tahun_ajaran');
 }
 
+public function aksi_update_status()
+{
+    $model = new M_kasus();
+    $id_user = session()->get('id');
+    $activity = 'Mengubah status tahun ajaran';
+    $this->addLog($id_user, $activity);
+
+    $status = $this->request->getPost('status');
+    $id = $this->request->getPost('id');
+
+    $isi = array(
+        'status' => $status,
+        'updated_at' => date('Y-m-d H:i:s'),
+        'updated_by' => $id_user
+    );
+
+    $where = array('id_tahun' => $id);
+    $model->edit('tahun_ajaran', $isi, $where);
+
+    return redirect()->to('home/tahun_ajaran');
+}
+
+
 public function hapustahun($id){
     $model = new M_kasus();
     $id_user = session()->get('id'); // Ambil ID user dari session
@@ -1402,7 +1451,7 @@ public function hapustahun($id){
 
     //Hapus data dari tabel backup_kelas
 $where = array('id_tahun' => $id);
-$model->hapus('backup_ktahun_ajaran', $where);
+$model->hapus('backup_tahun_ajaran', $where);
 
     return redirect()->to('home/tahun_ajaran');
 }
@@ -1517,12 +1566,14 @@ public function restore_tahun_ajaran()
 }
 
     
-    public function print()
+public function print()
 {
     $model = new M_kasus();
     $print_option = $this->request->getPost('print_option');
     $tahun_ajaran = $this->request->getPost('tahun_ajaran');
+    $student = $this->request->getPost('student');
 
+    // Menentukan kondisi berdasarkan opsi cetak
     if ($print_option == 'all') {
         $where = ['kasus_pelanggaran.isdelete' => 0];
     } elseif ($print_option == 'year' && $tahun_ajaran) {
@@ -1530,10 +1581,16 @@ public function restore_tahun_ajaran()
             'kasus_pelanggaran.isdelete' => 0,
             'kasus_pelanggaran.id_tahun' => $tahun_ajaran
         ];
+    } elseif ($print_option == 'student' && $student) {
+        $where = [
+            'kasus_pelanggaran.isdelete' => 0,
+            'kasus_pelanggaran.id_user' => $student
+        ];
     } else {
-        return redirect()->to('catatan_kasus')->with('error', 'Pilihan cetak tidak valid!');
+        return redirect()->to('catatan_kasus')->with('error', 'Pilihan cetak tidak valid atau data belum lengkap!');
     }
 
+    // Mengambil data kasus berdasarkan kondisi
     $data['kasus'] = $model->jointigawhere(
         'kasus_pelanggaran', 
         'user', 
@@ -1541,16 +1598,99 @@ public function restore_tahun_ajaran()
         'kasus_pelanggaran.id_user=user.id_user', 
         'user.id_kelas=kelas.id_kelas', 
         'kasus_pelanggaran.id_kasus',  
-        $where 
+        $where
     );
 
-    $where=array(
-        'id_setting'=> 1
-      );
-      $data['setting'] = $model->getWhere('setting',$where);
+    // Mengambil data setting
+    $data['setting'] = $model->getWhere('setting', ['id_setting' => 1]);
 
     // Load view khusus untuk cetak
     return view('catatan_kasus_print', $data);
 }
+//surat
+
+public function submitSurat()
+{
+    $model = new M_kasus(); // Pastikan Anda memiliki model untuk surat
+    $id_user = session()->get('id'); // Ambil ID user dari session
+
+    // Ambil data dari form
+    $kasusId = $this->request->getPost('kasus_id');
+    $nomor = $this->request->getPost('nomor');
+    $lampiran = $this->request->getPost('lampiran');
+    $perihal = $this->request->getPost('perihal');
+    $isiSurat = $this->request->getPost('isi_surat');
+    
+    $isi = array(
+        'id_kasus' => $kasusId,
+        'nomor_surat' => $nomor,
+        'lampiran' => $lampiran,
+        'perihal' => $perihal,
+        'isi_surat' => $isiSurat,
+        'created_at' => date('Y-m-d H:i:s'), // Waktu saat surat dibuat
+        'created_by' => $id_user // ID user yang login
+    );
+
+    // Cek apakah id_kasus sudah ada di tabel surat_peringatan
+    $existingSurat = $model->db->table('surat_peringatan')->where('id_kasus', $kasusId)->get()->getRowArray();
+
+    if ($existingSurat) {
+        // Jika sudah ada, lakukan update
+        $isi['updated_at'] = date('Y-m-d H:i:s'); // Waktu saat data diupdate
+        $isi['updated_by'] = $id_user; // ID user yang melakukan update
+
+        $where = ['id_kasus' => $kasusId];
+        $model->edit('surat_peringatan', $isi, $where);
+    } else {
+        // Jika belum ada, lakukan insert
+        $model->tambah('surat_peringatan', $isi);
+    }
+
+    return redirect()->to('home/printsurat'); // Atau arahkan ke halaman lain setelah sukses
+}
+
+public function printsurat()
+{
+    if (session()->get('level') == 0 || session()->get('level') == 1|| session()->get('level') == 6) {
+
+        $model = new M_kasus();
+        $id_user = session()->get('id'); // Ambil ID user dari session
+
+        $where = array(
+            'kasus_pelanggaran.isdelete' => 0 // Tambahkan kondisi untuk isdelete=0
+            
+        );
+        $data['elly'] = $model->joinempatwherekasus(
+            'kasus_pelanggaran', 
+            'user', 
+            'kelas', 
+            'surat_peringatan', 
+            'kasus_pelanggaran.id_user=user.id_user', 
+            'user.id_kelas=kelas.id_kelas', 
+            'surat_peringatan.id_kasus=kasus_pelanggaran.id_kasus', 
+            'kasus_pelanggaran.id_kasus',  $where 
+            
+        );
+        
+        $where = array(
+            'level' => 2,
+            'isdelete' => 0
+        );
+        
+        $data['kepala'] = $model->getWhere('user', $where);
+        
+        
+        $where = ['id_setting' => 1];
+        $data['setting'] = $model->getWhere('setting', $where);
+        $data['currentMenu'] = 'catatan_kasus'; // Sesuaikan dengan menu yang aktif
+        
+        echo view('printsurat', $data);
+       
+    } else {
+        return redirect()->to('home/error');
+    }
+}
+
+
 
 }

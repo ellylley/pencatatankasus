@@ -103,6 +103,8 @@
                     data-nik="<?= $gou->nik ?>"
                     data-kelas="<?= $gou->id_kelas ?>"
                     data-foto="<?= $gou->foto ?>"
+                    data-nowali="<?= $gou->nohp_wali ?>"
+                    data-namawali="<?= $gou->nama_wali ?>"
                    
                     data-password="<?= $gou->password ?>">
                     Edit
@@ -126,6 +128,8 @@
                     data-nik="<?= $backup_users[$gou->id_user]->nik ?>"
                     data-kelas="<?= $backup_users[$gou->id_user]->id_kelas ?>"
                     data-foto="<?= $backup_users[$gou->id_user]->foto ?>"
+                    data-nowali="<?= $backup_users[$gou->id_user]->nohp_wali ?>"
+                    data-namawali="<?= $backup_users[$gou->id_user]->nama_wali ?>"
                     >
                     Undo Edit
                 </button>
@@ -256,6 +260,20 @@
                             </div>
 
                             <div class="col-md-4">
+                                <label id="namawaliLabel" style="display:none;">Nama Wali</label>
+                            </div>
+                            <div class="col-md-8 form-group">
+                                <input type="text" id="namawali" class="form-control" name="namawali" placeholder="Nama Wali" style="display:none;">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label id="nowaliLabel" style="display:none;">Nomor Wali</label>
+                            </div>
+                            <div class="col-md-8 form-group">
+                                <input type="text" id="nowali" class="form-control" name="nowali" placeholder="Nomor Wali" style="display:none;">
+                            </div>
+
+                            <div class="col-md-4">
                                 <label id="nikLabel" style="display:none;">NIK</label>
                             </div>
                             <div class="col-md-8 form-group">
@@ -379,6 +397,20 @@
                             </div>
                             <div class="col-md-8 form-group">
                                 <input type="text" id="editNisn" class="form-control" name="nisn" placeholder="NISN" style="display:none;">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label id="editnamawaliLabel" style="display:none;">Nama Wali</label>
+                            </div>
+                            <div class="col-md-8 form-group">
+                                <input type="text" id="editnamawali" class="form-control" name="namawali" placeholder="Nama Wali" style="display:none;">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label id="editnowaliLabel" style="display:none;">Nomor Wali</label>
+                            </div>
+                            <div class="col-md-8 form-group">
+                                <input type="text" id="editnowali" class="form-control" name="nowali" placeholder="Nomor Wali" style="display:none;">
                             </div>
 
                             <div class="col-md-4">
@@ -520,6 +552,20 @@
                 </div>
 
                 <div class="col-md-4">
+                                <label id="undonamawaliLabel" style="display:none;">Nama Wali</label>
+                            </div>
+                            <div class="col-md-8 form-group">
+                                <input type="text" id="undonamawali" class="form-control disabled-field" name="namawali" placeholder="Nama Wali" style="display:none;">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label id="undonowaliLabel" style="display:none;">Nomor Wali</label>
+                            </div>
+                            <div class="col-md-8 form-group">
+                                <input type="text" id="undonowali" class="form-control disabled-field" name="nowali" placeholder="Nomor Wali" style="display:none;">
+                            </div>
+                
+                <div class="col-md-4">
                     <label id="undoNikLabel" style="display:none;">NIK</label>
                 </div>
                 <div class="col-md-8 form-group">
@@ -568,6 +614,8 @@
         var nuptk = button.getAttribute('data-nuptk');
         var nik = button.getAttribute('data-nik');
         var kelas = button.getAttribute('data-kelas');
+        var nowali = button.getAttribute('data-nowali');
+        var namawali = button.getAttribute('data-namawali');
         var foto = button.getAttribute('data-foto');
        
         var password = button.getAttribute('data-password');
@@ -585,6 +633,8 @@
         modal.querySelector('#editNuptk').value = nuptk;
         modal.querySelector('#editNik').value = nik;
         modal.querySelector('#editKelas').value = kelas;
+        modal.querySelector('#editnowali').value = nowali;
+        modal.querySelector('#editnamawali').value = namawali;
        
         modal.querySelector('#old_foto').value = foto;
         modal.querySelector('#editPassword').value = password;
@@ -604,6 +654,8 @@
     modal.querySelector('#undoNuptk').value = nuptk;
     modal.querySelector('#undoNik').value = nik;
     modal.querySelector('#undoKelas').value = kelas;
+    modal.querySelector('#undonowali').value = nowali;
+    modal.querySelector('#undonamawali').value = namawali;
     modal.querySelector('#undoProfileImg').src = "<?= base_url('images/')?>" + '/' + foto;
 
 
@@ -619,12 +671,16 @@
     var nisnField = document.getElementById('editNisn');
     var nuptkField = document.getElementById('editNuptk');
     var nikField = document.getElementById('editNik');
+    var namawaliField = document.getElementById('editnamawali');
+    var nowaliField = document.getElementById('editnowali');
 
     var kelasLabel = document.getElementById('editKelasLabel');
     var nisLabel = document.getElementById('editNisLabel');
     var nisnLabel = document.getElementById('editNisnLabel');
     var nuptkLabel = document.getElementById('editNuptkLabel');
     var nikLabel = document.getElementById('editNikLabel');
+    var namawaliLabel = document.getElementById('editnamawaliLabel');
+    var nowaliLabel = document.getElementById('editnowaliLabel');
 
     // Menampilkan kelas hanya untuk level 6 dan 7
     if (level == 7) {
@@ -659,11 +715,19 @@
     if (level == 7) {
         nisField.style.display = 'block';
         nisLabel.style.display = 'block';
+        namawaliField.style.display = 'block';
+        namawaliLabel.style.display = 'block';
+        nowaliField.style.display = 'block';
+        nowaliLabel.style.display = 'block';
         nisnField.style.display = 'block';
         nisnLabel.style.display = 'block';
     } else {
         nisField.style.display = 'none';
         nisLabel.style.display = 'none';
+        namawaliField.style.display = 'none';
+        namawaliLabel.style.display = 'none';
+        nowaliField.style.display = 'none';
+        nowaliLabel.style.display = 'none';
         nisnField.style.display = 'none';
         nisnLabel.style.display = 'none';
     }
@@ -678,12 +742,16 @@ function toggleUndoKelas() {
     var nisnField = document.getElementById('undoNisn');
     var nuptkField = document.getElementById('undoNuptk');
     var nikField = document.getElementById('undoNik');
+    var namawaliField = document.getElementById('undonamawali');
+    var nowaliField = document.getElementById('undonowali');
     
     var kelasLabel = document.getElementById('undoKelasLabel');
     var nisLabel = document.getElementById('undoNisLabel');
     var nisnLabel = document.getElementById('undoNisnLabel');
     var nuptkLabel = document.getElementById('undoNuptkLabel');
     var nikLabel = document.getElementById('undoNikLabel');
+    var namawaliLabel = document.getElementById('undonamawaliLabel');
+    var nowaliLabel = document.getElementById('undonowaliLabel');
 
     
 
@@ -720,11 +788,19 @@ function toggleUndoKelas() {
     if (level == 7) {
         nisField.style.display = 'block';
         nisLabel.style.display = 'block';
+        namawaliField.style.display = 'block';
+        namawaliLabel.style.display = 'block';
+        nowaliField.style.display = 'block';
+        nowaliLabel.style.display = 'block';
         nisnField.style.display = 'block';
         nisnLabel.style.display = 'block';
     } else {
         nisField.style.display = 'none';
         nisLabel.style.display = 'none';
+        namawaliField.style.display = 'none';
+        namawaliLabel.style.display = 'none';
+        nowaliField.style.display = 'none';
+        nowaliLabel.style.display = 'none';
         nisnField.style.display = 'none';
         nisnLabel.style.display = 'none';
     }
@@ -738,18 +814,22 @@ function toggleUndoKelas() {
     var nisnField = document.getElementById('nisn');
     var nuptkField = document.getElementById('nuptk');
     var nikField = document.getElementById('nik');
+    var namawaliField = document.getElementById('namawali');
+    var nowaliField = document.getElementById('nowali');
 
     var kelasLabel = document.getElementById('kelasLabel');
     var nisLabel = document.getElementById('nisLabel');
     var nisnLabel = document.getElementById('nisnLabel');
     var nuptkLabel = document.getElementById('nuptkLabel');
     var nikLabel = document.getElementById('nikLabel');
+    var namawaliLabel = document.getElementById('namawaliLabel');
+    var nowaliLabel = document.getElementById('nowaliLabel');
 
     // Menampilkan kelas hanya untuk Murid (level 5)
     
 
     // Menampilkan kelas hanya untuk level 6 dan 7
-    if (level == 6 || level == 7) {
+    if (level == 7) {
         kelasField.style.display = 'block';
         kelasLabel.style.display = 'block';
     } else {
@@ -767,7 +847,7 @@ function toggleUndoKelas() {
     }
 
     // Menampilkan NIK dan NUPTK untuk level 2, 3, 4, 5
-    if (level == 2 || level == 3 || level == 4 || level == 5) {
+    if (level == 2 || level == 3 || level == 4 || level == 5 || level == 6) {
         nikField.style.display = 'block';
         nikLabel.style.display = 'block';
         nuptkField.style.display = 'block';
@@ -778,14 +858,22 @@ function toggleUndoKelas() {
     }
 
     // Menampilkan NIS dan NISN hanya untuk level 6
-    if (level == 6) {
+    if (level == 7) {
         nisField.style.display = 'block';
         nisLabel.style.display = 'block';
+        namawaliField.style.display = 'block';
+        namawaliLabel.style.display = 'block';
+        nowaliField.style.display = 'block';
+        nowaliLabel.style.display = 'block';
         nisnField.style.display = 'block';
         nisnLabel.style.display = 'block';
     } else {
         nisField.style.display = 'none';
         nisLabel.style.display = 'none';
+        namawaliField.style.display = 'none';
+        namawaliLabel.style.display = 'none';
+        nowaliField.style.display = 'none';
+        nowaliLabel.style.display = 'none';
         nisnField.style.display = 'none';
         nisnLabel.style.display = 'none';
     }
