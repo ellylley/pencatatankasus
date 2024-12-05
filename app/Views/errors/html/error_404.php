@@ -16,6 +16,7 @@
 
 
 
+
 <body>
     <div id="app">
         <div id="sidebar" class='active'>
@@ -57,7 +58,7 @@
 if(session()->get('level') == 1) 
 {
 ?> 
-                <li class="sidebar-item has-sub <?= ($currentMenu == 'user' || $currentMenu == 'kelas' || $currentMenu == 'tahun_ajaran'|| $currentMenu == 'restore_tahun_ajaran' ) ? 'active' : '' ?>">
+                <li class="sidebar-item has-sub <?= ($currentMenu == 'user' || $currentMenu == 'kelas' || $currentMenu == 'tahun_ajaran' ) ? 'active' : '' ?>">
 
 <a href="#" class='sidebar-link'>
 <i data-feather="database" width="20"></i> 
@@ -163,11 +164,13 @@ if(session()->get('level') == 1)
         <a href="<?= base_url("home/restore_kelas")?>">RESTORE KELAS</a>
     </li>
 
-    <li>
-        <a href="<?= base_url("home/restore_kasus")?>">RESTORE KASUS</a>
-    </li>
+   
     <li>
         <a href="<?= base_url("home/restore_tahun_ajaran")?>">RESTORE TAHUN AJARAN</a>
+    </li>
+
+    <li>
+        <a href="<?= base_url("home/restore_kasus")?>">RESTORE CATATAN KASUS</a>
     </li>
     
 </ul>
@@ -214,6 +217,10 @@ if(session()->get('level') == 1)
                     </ul>
                 </div>
             </nav>
+            
+
+           
+
             
 
            
